@@ -20,6 +20,8 @@ bool FFDemux::Open(const char *url) {
         XLOGE("FFDemux open %s failed!", url);
         return false;
     }
+    GetVPara();
+    GetAPara();
     XLOGI("FFDemux open %s success!", url);
 
     //读取文件信息
@@ -32,7 +34,6 @@ bool FFDemux::Open(const char *url) {
     }
     this->totalMs = ic->duration / (AV_TIME_BASE / 1000);
     XLOGI("total ms = %d !", totalMs);
-
 
     return true;
 }
@@ -51,7 +52,49 @@ XData FFDemux::Read() {
     //XLOGI("pack size is %d , pts is %lld ", pkt->size, pkt->pts);
     data.data = reinterpret_cast<unsigned char *>(pkt);
     data.size = pkt->size;
+    if (pkt->stream_index == AVMEDIA_TYPE_AUDIO) {
+        data.isAudio = true;
+    } else if (pkt->stream_index == AVMEDIA_TYPE_VIDEO) {
+        data.isAudio = false;
+    } else { //销毁数据, 防止内存泄漏
+        av_packet_free(&pkt);
+        return XData();
+    }
     return data;
+}
+
+XParameter FFDemux::GetVPara() {
+    if (!ic) {
+        XLOGE("GetVPara failed! ic is NULL！");
+        return XParameter();
+    }
+    //获取了视频流索引
+    int re = av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO, -1, -1, 0, 0);
+    if (re < 0) {
+        XLOGE("av_find_best_stream failed!");
+        return XParameter();
+    }
+    videoStream = re;
+    XParameter para;
+    para.para = ic->streams[re]->codecpar;
+    return para;
+}
+
+XParameter FFDemux::GetAPara() {
+    if (!ic) {
+        XLOGE("GetVPara failed! ic is NULL！");
+        return XParameter();
+    }
+    //获取了音频流索引
+    int re = av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, -1, -1, 0, 0);
+    if (re < 0) {
+        XLOGE("av_find_best_stream failed!");
+        return XParameter();
+    }
+    audioStream = re;
+    XParameter para;
+    para.para = ic->streams[re]->codecpar;
+    return para;
 }
 
 FFDemux::FFDemux() {
