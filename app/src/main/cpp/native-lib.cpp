@@ -6,13 +6,6 @@
 #include "FFDecode.h"
 
 
-class TestObs:public IObserver {
-public:
-    void Update(XData data){
-        //XLOGI("TestObs Updata size is %d", data.size);
-    }
-};
-
 extern "C" JNIEXPORT jstring
 
 JNICALL
@@ -31,7 +24,7 @@ Java_com_tutk_xplayer_xplayer_MainActivity_stringFromJNI(
     vDecode->Open(de->GetVPara());
 
     IDecode *aDecode = new FFDecode();
-    vDecode->Open(de->GetAPara());
+    aDecode->Open(de->GetAPara());
 
     de->AddObs(vDecode);
     de->AddObs(aDecode);

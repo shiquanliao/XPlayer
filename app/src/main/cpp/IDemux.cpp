@@ -14,3 +14,9 @@ void IDemux::Main() {
         //if (d.size <= 0) break;
     }
 }
+
+void IDemux::Update(XData data) {
+    IObserver::Update(data);
+}
+
+

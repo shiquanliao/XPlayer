@@ -28,9 +28,9 @@ public:
     int totalMs = 0;
 
 protected:
-    virtual void Main();
+    virtual void Main() override ;
 
-    virtual void Update(XData data);
+    virtual void Update(XData data) override ;
 
 };
 
