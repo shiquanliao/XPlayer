@@ -70,6 +70,15 @@ add_library( native-lib
              src/main/cpp/IDecode.cpp
              src/main/cpp/FFDecode.cpp
              src/main/cpp/XParameter.cpp
+             src/main/cpp/IVideoView.cpp
+             src/main/cpp/GLVideoView.cpp
+             src/main/cpp/XTexture.cpp
+             src/main/cpp/XShader.cpp
+             src/main/cpp/XEGL.cpp
+             src/main/cpp/FFResample.cpp
+             src/main/cpp/IResample.cpp
+             src/main/cpp/IAudioPlay.cpp
+             src/main/cpp/SLAudioPlay.cpp
             )
 
 target_link_libraries( # Specifies the target library.

@@ -46,14 +46,14 @@ void IDecode::Main() {
                 XData frame = RecvFrame();
 //                XLOGE("frame %d",frame.size);
                 if (!frame.data) break;
-                XLOGE("RecvFrame %d",frame.size);
+//                XLOGE("RecvFrame %d", frame.size);
 
                 //发送数据给观察者(视频播放观察者,音频播放器观察者)
                 this->Notify(frame);
             }
         }
-        pack.Drop();
 
+        pack.Drop();
         packsMutex.unlock();
     }
 }
