@@ -36,22 +36,22 @@ void IDecode::Main() {
             continue;
         }
         // 取出packet 消费者
+        bool bIsInput = false;
         XData pack = packs.front();
         packs.pop_front();  //把头部的数据从列表中删除
 
-        //发送数据到解码线程，一个数据包，可能解码多个结果
-        if (this->SendPacket(pack)) {
-            while (!isExit) {
-                //获取解码数据
+        do{
+            bIsInput = this->SendPacket(pack);
+            do{
+                // 获取解码数据
                 XData frame = RecvFrame();
-//                XLOGE("frame %d",frame.size);
+                // XLOGE("frame %d",frame.size);
                 if (!frame.data) break;
-//                XLOGE("RecvFrame %d", frame.size);
-
-                //发送数据给观察者(视频播放观察者,音频播放器观察者)
+                // XLOGE("RecvFrame %d", frame.size);
+                // 发送数据给观察者(视频播放观察者,音频播放器观察者)
                 this->Notify(frame);
-            }
-        }
+            } while (!isExit);
+        } while (!bIsInput);
 
         pack.Drop();
         packsMutex.unlock();

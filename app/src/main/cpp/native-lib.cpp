@@ -10,18 +10,14 @@
 #include "GLVideoView.h"
 #include "FFResample.h"
 #include "SLAudioPlay.h"
-#include <android/native_window_jni.h>
 
 
 IVideoView *view = NULL;
 
-extern "C" JNIEXPORT jstring
-
-JNICALL
-Java_com_tutk_xplayer_xplayer_MainActivity_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
+extern "C"
+JNIEXPORT
+jint JNI_OnLoad(JavaVM *vm, void *res) {
+    FFDecode::InitHard(vm);
 
     ////////////////////////////////////////
     // 测试代码
@@ -30,7 +26,7 @@ Java_com_tutk_xplayer_xplayer_MainActivity_stringFromJNI(
     de->Open("/sdcard/testFFmpeg.mp4");
 
     IDecode *vDecode = new FFDecode();
-    vDecode->Open(de->GetVPara());
+    vDecode->Open(de->GetVPara(), true);
 
     IDecode *aDecode = new FFDecode();
     aDecode->Open(de->GetAPara());
@@ -44,7 +40,7 @@ Java_com_tutk_xplayer_xplayer_MainActivity_stringFromJNI(
     IResample *resample = new FFResample();
     XParameter outPara = de->GetAPara();
 
-    resample->Open(de->GetAPara(),outPara);
+    resample->Open(de->GetAPara(), outPara);
     aDecode->AddObs(resample);
 
     IAudioPlay *audioPlay = new SLAudioPlay();
@@ -67,6 +63,19 @@ Java_com_tutk_xplayer_xplayer_MainActivity_stringFromJNI(
     ///////////////////////////////////////
 
 
+    return JNI_VERSION_1_4;
+}
+
+
+#include <android/native_window_jni.h>
+
+extern "C" JNIEXPORT jstring
+
+JNICALL
+Java_com_tutk_xplayer_xplayer_MainActivity_stringFromJNI(
+        JNIEnv *env,
+        jobject /* this */) {
+    std::string hello = "Hello from C++";
 
     return env->NewStringUTF(hello.c_str());
 }
