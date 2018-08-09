@@ -32,7 +32,7 @@ bool FFResample::Open(XParameter in, XParameter out) {
     outChannels = in.para->channels;
     outFormat = AV_SAMPLE_FMT_S16;
 
-    return false;
+    return true;
 }
 
 XData FFResample::Resample(XData indata) {

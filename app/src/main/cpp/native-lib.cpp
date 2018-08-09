@@ -10,6 +10,7 @@
 #include "GLVideoView.h"
 #include "FFResample.h"
 #include "SLAudioPlay.h"
+#include "IPlayer.h"
 
 
 IVideoView *view = NULL;
@@ -23,13 +24,14 @@ jint JNI_OnLoad(JavaVM *vm, void *res) {
     // 测试代码
 //    TestObs *obs = new TestObs();
     IDemux *de = new FFDemux();
-    de->Open("/sdcard/testFFmpeg.mp4");
+    //de->Open("/sdcard/testFFmpeg.mp4");
 
     IDecode *vDecode = new FFDecode();
-    vDecode->Open(de->GetVPara(), true);
+    //vDecode->Open(de->GetVPara(), true);
 
     IDecode *aDecode = new FFDecode();
-    aDecode->Open(de->GetAPara());
+    //aDecode->Open(de->GetAPara());
+
 
     de->AddObs(vDecode);
     de->AddObs(aDecode);
@@ -38,19 +40,29 @@ jint JNI_OnLoad(JavaVM *vm, void *res) {
     vDecode->AddObs(view);
 
     IResample *resample = new FFResample();
-    XParameter outPara = de->GetAPara();
+    //XParameter outPara = de->GetAPara();
 
-    resample->Open(de->GetAPara(), outPara);
+    //resample->Open(de->GetAPara(), outPara);
     aDecode->AddObs(resample);
 
     IAudioPlay *audioPlay = new SLAudioPlay();
-    audioPlay->StartPlay(outPara);
+    //audioPlay->StartPlay(outPara);
     resample->AddObs(audioPlay);
 
+    IPlayer::Get()->demux = de;
+    IPlayer::Get()->aDecode = aDecode;
+    IPlayer::Get()->vDecode = vDecode;
+    IPlayer::Get()->resample = resample;
+    IPlayer::Get()->videoView = view;
+    IPlayer::Get()->audioPlay = audioPlay;
+
+    IPlayer::Get()->Open("/sdcard/testFFmpeg.mp4");
+    IPlayer::Get()->Start();
+
     //de->AddObs(obs);
-    de->Start();
-    vDecode->Start();
-    aDecode->Start();
+    //de->Start();
+    //vDecode->Start();
+    //aDecode->Start();
 
 //    XSleep(3000);
 //    de->Stop();
@@ -87,7 +99,8 @@ Java_com_tutk_xplayer_xplayer_XPlay_InitView(JNIEnv *env, jobject instance, jobj
 
     // TODO
     ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
-    view->SetRender(win);
+    IPlayer::Get()->InitView(win);
+    //view->SetRender(win);
 //    XEGL::Get()->Init(win);
 //    XShader shader;
 //    shader.Init();
