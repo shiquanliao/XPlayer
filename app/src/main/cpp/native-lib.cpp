@@ -2,76 +2,26 @@
 #include <string>
 #include "FFDemux.h"
 #include "XLog.h"
-#include "IDecode.h"
-#include "FFDecode.h"
-#include "XEGL.h"
-#include "XShader.h"
-#include "IVideoView.h"
-#include "GLVideoView.h"
-#include "FFResample.h"
-#include "SLAudioPlay.h"
-#include "IPlayer.h"
+#include "FFPlayerBuilder.h"
 
 
-IVideoView *view = NULL;
+//IVideoView *view = NULL;
+static IPlayer *player = NULL;
 
 extern "C"
 JNIEXPORT
 jint JNI_OnLoad(JavaVM *vm, void *res) {
-    FFDecode::InitHard(vm);
+    //FFDecode::InitHard(vm);
+    FFPlayerBuilder::InitHard(vm);
 
     ////////////////////////////////////////
     // 测试代码
-//    TestObs *obs = new TestObs();
-    IDemux *de = new FFDemux();
-    //de->Open("/sdcard/testFFmpeg.mp4");
+    player = FFPlayerBuilder::Get()->BuilderPlayer();
 
-    IDecode *vDecode = new FFDecode();
-    //vDecode->Open(de->GetVPara(), true);
-
-    IDecode *aDecode = new FFDecode();
-    //aDecode->Open(de->GetAPara());
+    player->Open("/sdcard/testFFmpeg.mp4");
+    player->Start();
 
 
-    de->AddObs(vDecode);
-    de->AddObs(aDecode);
-
-    view = new GLVideoView();
-    vDecode->AddObs(view);
-
-    IResample *resample = new FFResample();
-    //XParameter outPara = de->GetAPara();
-
-    //resample->Open(de->GetAPara(), outPara);
-    aDecode->AddObs(resample);
-
-    IAudioPlay *audioPlay = new SLAudioPlay();
-    //audioPlay->StartPlay(outPara);
-    resample->AddObs(audioPlay);
-
-    IPlayer::Get()->demux = de;
-    IPlayer::Get()->aDecode = aDecode;
-    IPlayer::Get()->vDecode = vDecode;
-    IPlayer::Get()->resample = resample;
-    IPlayer::Get()->videoView = view;
-    IPlayer::Get()->audioPlay = audioPlay;
-
-    IPlayer::Get()->Open("/sdcard/testFFmpeg.mp4");
-    IPlayer::Get()->Start();
-
-    //de->AddObs(obs);
-    //de->Start();
-    //vDecode->Start();
-    //aDecode->Start();
-
-//    XSleep(3000);
-//    de->Stop();
-
-
-//    for (;;) {
-//        XData data = de->Read();
-//        XLOGI("Read packet data size is %d",data.size);
-//    }
     ///////////////////////////////////////
 
 
@@ -99,7 +49,8 @@ Java_com_tutk_xplayer_xplayer_XPlay_InitView(JNIEnv *env, jobject instance, jobj
 
     // TODO
     ANativeWindow *win = ANativeWindow_fromSurface(env, surface);
-    IPlayer::Get()->InitView(win);
+    if (player)
+        player->InitView(win);
     //view->SetRender(win);
 //    XEGL::Get()->Init(win);
 //    XShader shader;

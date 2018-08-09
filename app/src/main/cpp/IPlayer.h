@@ -30,7 +30,6 @@ public:
     bool Start() override;
 
 
-
     //是否视频硬解码
     bool isHardDecode = true;
 
