@@ -82,6 +82,7 @@ add_library( native-lib
              src/main/cpp/IPlayer.cpp
              src/main/cpp/IPlayerBuilder.cpp
              src/main/cpp/FFPlayerBuilder.cpp
+             src/main/cpp/IPlayProxy.cpp
             )
 
 target_link_libraries( # Specifies the target library.

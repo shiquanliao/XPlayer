@@ -9,7 +9,7 @@
 
 class IPlayerBuilder {
 public:
-    virtual IPlayer *BuilderPlayer(unsigned char index = '0');
+    virtual IPlayer *BuilderPlayer(unsigned char index = 0);
 
 protected:
     virtual IDemux *CreateDemux() = 0;
