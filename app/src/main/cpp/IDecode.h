@@ -15,6 +15,8 @@ public:
     //打开解码器
     virtual bool Open(XParameter para, bool isHard = false) = 0;
 
+    virtual void Close() = 0;
+
     //future模型 发送数据到线程解码
     virtual bool SendPacket(XData pkt) = 0;
 
@@ -28,6 +30,12 @@ public:
 
     //最大的队列缓冲
     int maxList = 100;
+
+    //同步时间, 再次打开文件数据要清理
+    int synPts = 0;
+    //当前视频播放的pts
+    int pts = 0;
+
 
 protected:
     virtual void Main();

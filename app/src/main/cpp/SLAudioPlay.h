@@ -12,6 +12,8 @@ class SLAudioPlay : public IAudioPlay {
 public:
     bool StartPlay(XParameter out) override;
 
+    void Close() override;
+
     void PlayCall(void *bufq);
 
     SLAudioPlay();
@@ -20,6 +22,7 @@ public:
 
 protected:
     unsigned char *buf = 0;
+    std::mutex mutex;
 
 };
 

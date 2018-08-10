@@ -13,6 +13,8 @@ extern "C"
 
 
 bool FFResample::Open(XParameter in, XParameter out) {
+    Close();
+    mutex.lock();
     //音频重采样上下文初始化
     actx = swr_alloc();
     actx = swr_alloc_set_opts(actx,
@@ -24,6 +26,7 @@ bool FFResample::Open(XParameter in, XParameter out) {
 
     int re = swr_init(actx);
     if (re != 0) {
+        mutex.unlock();
         XLOGE("swr_init failed!");
         return false;
     } else {
@@ -32,13 +35,26 @@ bool FFResample::Open(XParameter in, XParameter out) {
     outChannels = in.para->channels;
     outFormat = AV_SAMPLE_FMT_S16;
 
+    mutex.unlock();
     return true;
+}
+
+void FFResample::Close() {
+    mutex.lock();
+    if (actx) {
+        swr_free(&actx);
+    }
+    mutex.unlock();
+
 }
 
 XData FFResample::Resample(XData indata) {
     if (indata.size <= 0 || !indata.data) return XData();
-    if (!actx)
+    mutex.lock();
+    if (!actx) {
+        mutex.unlock();
         return XData();
+    }
     //XLOGE("indata size is %d",indata.size);
     AVFrame *frame = (AVFrame *) indata.data;
 
@@ -47,17 +63,24 @@ XData FFResample::Resample(XData indata) {
     XData out;
     int outsize =
             outChannels * frame->nb_samples * av_get_bytes_per_sample((AVSampleFormat) outFormat);
-    if (outsize <= 0)return XData();
+    if (outsize <= 0) {
+        mutex.unlock();
+        return XData();
+    }
     out.Alloc(outsize);
     uint8_t *outArr[2] = {0};
     outArr[0] = out.data;
     int len = swr_convert(actx, outArr, frame->nb_samples, (const uint8_t **) frame->data,
                           frame->nb_samples);
     if (len <= 0) {
+        mutex.unlock();
         out.Drop();
         return XData();
     }
+    out.pts = indata.pts;
     //XLOGE("swr_convert success = %d", len);
+
+    mutex.unlock();
     return out;
 
 }

@@ -6,6 +6,7 @@
 #define XPLAYER_IPLAYER_H
 
 
+#include <mutex>
 #include "XThread.h"
 #include "XParameter.h"
 
@@ -44,6 +45,9 @@ public:
     IVideoView *videoView = 0;
 
 protected:
+    //用作音视频同步
+    void Main() override;
+    std::mutex mutex;
     IPlayer();
 
 };

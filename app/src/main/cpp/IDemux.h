@@ -15,6 +15,8 @@ public:
     //打开文件，或者流媒体 rmtp http rtsp
     virtual bool Open(const char *url) = 0;
 
+    virtual void Close() = 0;
+
     //获取视频参数
     virtual XParameter GetVPara() = 0;
 
@@ -28,9 +30,9 @@ public:
     int totalMs = 0;
 
 protected:
-    virtual void Main() override ;
+    virtual void Main() override;
 
-    virtual void Update(XData data) override ;
+    virtual void Update(XData data) override;
 
 };
 

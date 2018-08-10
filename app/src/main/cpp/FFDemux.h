@@ -16,6 +16,8 @@ public:
     //打开文件，或者流媒体 rmtp http rtsp
     virtual bool Open(const char *url) override ;
 
+    void Close() override;
+
     //获取视频参数
     virtual XParameter GetVPara() override ;
 
@@ -29,6 +31,7 @@ public:
 
 private:
     AVFormatContext *ic = 0; // 只有c++11以上,并且只有无参构造函数时才生效
+    std::mutex mutex;
     int audioStream = 1;
     int videoStream = 0;
 

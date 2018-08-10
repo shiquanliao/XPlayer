@@ -30,6 +30,17 @@ void IDecode::Main() {
 
     while (!isExit) {
         packsMutex.lock();
+
+        // 判断音视频同步
+        if (!isAudio && synPts > 0) {
+            if (synPts < pts) {
+                packsMutex.unlock();
+                XSleep(1);
+                continue;
+            }
+        }
+
+
         if (packs.empty()) {
             packsMutex.unlock();
             XSleep(1);
@@ -40,13 +51,14 @@ void IDecode::Main() {
         XData pack = packs.front();
         packs.pop_front();  //把头部的数据从列表中删除
 
-        do{
+        do {
             bIsInput = this->SendPacket(pack);
-            do{
+            do {
                 // 获取解码数据
                 XData frame = RecvFrame();
                 // XLOGE("frame %d",frame.size);
                 if (!frame.data) break;
+                pts = frame.pts;
                 // XLOGE("RecvFrame %d", frame.size);
                 // 发送数据给观察者(视频播放观察者,音频播放器观察者)
                 this->Notify(frame);
