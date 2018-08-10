@@ -16,9 +16,12 @@ public:
 
     virtual void Render(XData data);
 
+    void Close() override;
+
 protected:
     void *view = 0;
     XTexture *txt = 0;
+    std::mutex mutex;
 
 };
 

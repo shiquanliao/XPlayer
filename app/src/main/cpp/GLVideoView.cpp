@@ -19,3 +19,12 @@ void GLVideoView::Render(XData data) {
 
 
 }
+
+void GLVideoView::Close() {
+    mutex.lock();
+    if (txt) {
+        txt->Drop();
+        txt = 0;
+    }
+    mutex.unlock();
+}
