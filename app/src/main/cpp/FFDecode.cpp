@@ -63,6 +63,7 @@ bool FFDecode::Open(XParameter para, bool isHard) {
 }
 
 void FFDecode::Close() {
+    IDecode::Clear();
     mutex.lock();
     pts = 0;
     if (frame) {

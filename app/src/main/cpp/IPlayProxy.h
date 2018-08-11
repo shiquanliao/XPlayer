@@ -16,14 +16,17 @@ public:
 
     void Init(void *vm = 0);
 
+    virtual void Close();
+
     bool Open(const char *path) override;
+
 
     void InitView(void *win) override;
 
     bool Start() override;
 
 protected:
-    IPlayProxy(){};
+    IPlayProxy() {};
     IPlayer *player = 0;
     std::mutex mutex;
 };

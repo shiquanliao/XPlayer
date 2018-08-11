@@ -22,6 +22,8 @@ public:
 
     virtual void Close() = 0;
 
+    virtual void Clear();
+
     //最大缓冲
     int maxFrame = 100;
     int pts = 0;

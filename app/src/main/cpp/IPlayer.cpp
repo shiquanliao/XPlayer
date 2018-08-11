@@ -15,7 +15,45 @@ IPlayer *IPlayer::Get(unsigned char index) {
     return &p[index];
 }
 
+void IPlayer::Close() {
+    mutex.lock();
+    //1 先关闭主体线程，再清理观察者
+    //同步线程
+    XThread::Stop();
+    //解封装
+    if(demux)
+        demux->Stop();
+    //解码
+    if(vDecode)
+        vDecode->Stop();
+    if(aDecode)
+        aDecode->Stop();
+
+    //2 清理缓冲队列
+    if(vDecode)
+        vDecode->Clear();
+    if(aDecode)
+        aDecode->Clear();
+    if(audioPlay)
+        audioPlay->Clear();
+
+    //3 清理资源
+    if(audioPlay)
+        audioPlay->Close();
+    if(videoView)
+        videoView->Close();
+    if(vDecode)
+        vDecode->Close();
+    if(aDecode)
+        aDecode->Close();
+    if(demux)
+        demux->Close();
+    mutex.unlock();
+
+}
+
 bool IPlayer::Open(const char *path) {
+    Close();
     mutex.lock();
     //解封装
     if (!demux || !demux->Open(path)) {
@@ -48,30 +86,33 @@ bool IPlayer::Start() {
 
     mutex.lock();
 
+    if(audioPlay)
+        audioPlay->StartPlay(outPara);
+    if(vDecode)
+        vDecode->Start();
+
+    if(aDecode)
+        aDecode->Start();
+
     if(!demux || !demux->Start())
     {
         mutex.unlock();
         XLOGE("demux->Start failed!");
         return false;
     }
-    if(aDecode)
-        aDecode->Start();
-    if(audioPlay)
-        audioPlay->StartPlay(outPara);
-    if(vDecode)
-        vDecode->Start();
+
 
     XThread::Start();
     mutex.unlock();
     return true;
 }
 
+
 void IPlayer::InitView(void *win) {
     if (videoView) {
         videoView->SetRender(win);
     }
 }
-
 
 void IPlayer::Main() {
     while (!isExit) {

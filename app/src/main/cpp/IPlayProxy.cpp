@@ -44,3 +44,10 @@ void IPlayProxy::InitView(void *win) {
         player->InitView(win);
     mutex.unlock();
 }
+
+void IPlayProxy::Close() {
+    mutex.lock();
+    if (player)
+        player->Close();
+    mutex.unlock();
+}

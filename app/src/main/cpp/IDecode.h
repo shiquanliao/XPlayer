@@ -17,6 +17,8 @@ public:
 
     virtual void Close() = 0;
 
+    virtual void Clear();
+
     //future模型 发送数据到线程解码
     virtual bool SendPacket(XData pkt) = 0;
 

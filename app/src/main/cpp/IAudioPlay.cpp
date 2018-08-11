@@ -42,3 +42,13 @@ void IAudioPlay::Update(XData data) {
         break;
     }
 }
+
+void IAudioPlay::Clear() {
+    framesMutex.lock();
+    while (!frames.empty()) {
+        frames.front().Drop();
+        frames.pop_front();
+    }
+    framesMutex.unlock();
+
+}
