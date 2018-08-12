@@ -4,7 +4,6 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -12,19 +11,20 @@ import javax.microedition.khronos.opengles.GL10;
 public class XPlay extends GLSurfaceView implements SurfaceHolder.Callback,GLSurfaceView.Renderer {
     public XPlay(Context context) {
         super(context);
+        // android 8.0 需要设置
+        setRenderer(this);
     }
 
     public XPlay(Context context, AttributeSet attrs) {
         super(context, attrs);
+        // android 8.0 需要设置
+        setRenderer(this);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         //初始化opengl egl 显示
         InitView(holder.getSurface());
-
-        // android 8.0 需要设置
-        setRenderer(this);
     }
 
     @Override

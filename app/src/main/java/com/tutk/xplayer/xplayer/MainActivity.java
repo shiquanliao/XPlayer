@@ -1,12 +1,14 @@
 package com.tutk.xplayer.xplayer;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.TextView;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,6 +16,8 @@ public class MainActivity extends AppCompatActivity {
     static {
         System.loadLibrary("native-lib");
     }
+
+    private Button mButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,21 +32,18 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
-        findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
+        mButton = findViewById(R.id.open_button);
+        mButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                stringFromJNI();
+            public void onClick(View view) {
+                Log.e("XPlay", " buttononClick~~~");
+                // 打开文件夹
+                Intent intent = new Intent(MainActivity.this,OpenUrlActivity.class);
+                startActivity(intent);
+
             }
         });
 
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
 }

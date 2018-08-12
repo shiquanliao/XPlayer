@@ -21,32 +21,32 @@ void IPlayer::Close() {
     //同步线程
     XThread::Stop();
     //解封装
-    if(demux)
+    if (demux)
         demux->Stop();
     //解码
-    if(vDecode)
+    if (vDecode)
         vDecode->Stop();
-    if(aDecode)
+    if (aDecode)
         aDecode->Stop();
 
     //2 清理缓冲队列
-    if(vDecode)
+    if (vDecode)
         vDecode->Clear();
-    if(aDecode)
+    if (aDecode)
         aDecode->Clear();
-    if(audioPlay)
+    if (audioPlay)
         audioPlay->Clear();
 
     //3 清理资源
-    if(audioPlay)
+    if (audioPlay)
         audioPlay->Close();
-    if(videoView)
+    if (videoView)
         videoView->Close();
-    if(vDecode)
+    if (vDecode)
         vDecode->Close();
-    if(aDecode)
+    if (aDecode)
         aDecode->Close();
-    if(demux)
+    if (demux)
         demux->Close();
     mutex.unlock();
 
@@ -72,8 +72,8 @@ bool IPlayer::Open(const char *path) {
         //return false;
     }
     //重采样 有可能不需要，解码后或者解封后可能是直接能播放的数据
-    if (outPara.sample_rate <= 0)
-        outPara = demux->GetAPara();
+    //if (outPara.sample_rate <= 0)
+    outPara = demux->GetAPara();
     if (!resample || !resample->Open(demux->GetAPara(), outPara)) {
         XLOGE("resample->Open %s failed!", path);
     }
@@ -86,16 +86,15 @@ bool IPlayer::Start() {
 
     mutex.lock();
 
-    if(audioPlay)
+    if (audioPlay)
         audioPlay->StartPlay(outPara);
-    if(vDecode)
+    if (vDecode)
         vDecode->Start();
 
-    if(aDecode)
+    if (aDecode)
         aDecode->Start();
 
-    if(!demux || !demux->Start())
-    {
+    if (!demux || !demux->Start()) {
         mutex.unlock();
         XLOGE("demux->Start failed!");
         return false;
@@ -110,6 +109,7 @@ bool IPlayer::Start() {
 
 void IPlayer::InitView(void *win) {
     if (videoView) {
+        videoView->Close();
         videoView->SetRender(win);
     }
 }

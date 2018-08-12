@@ -39,6 +39,14 @@ void SLAudioPlay::Close() {
     if (engineSL && (*engineSL)) {
         (*engineSL)->Destroy(engineSL);
     }
+
+    engineSL = NULL;
+    eng = NULL;
+    mix = NULL;
+    player = NULL;
+    iplayer = NULL;
+    pcmQue = NULL;
+
     mutex.unlock();
 
 }
@@ -80,7 +88,8 @@ void SLAudioPlay::PlayCall(void *bufq) {
         return;
     memcpy(buf, d.data, d.size);
     mutex.lock();
-    (*bf)->Enqueue(bf, buf, d.size);
+    if (pcmQue && (*pcmQue))
+        (*pcmQue)->Enqueue(pcmQue, buf, d.size);
     mutex.unlock();
     d.Drop();
 
