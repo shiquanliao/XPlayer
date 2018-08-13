@@ -92,7 +92,7 @@ XData FFDemux::Read() {
     pkt->pts = pkt->pts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
     pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
     data.pts = (int) pkt->pts;
-    XLOGE("demux pts %d", data.pts);
+    //XLOGE("demux pts %d", data.pts);
 
     mux.unlock();
     return data;

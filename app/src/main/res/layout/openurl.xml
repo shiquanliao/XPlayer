@@ -33,14 +33,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/playvideo"/>
 
+
+    <!--android:text="/sdcard/testFFMpeg.mp4"-->
     <EditText
         android:id="@+id/fileurl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:ems="20"
+        android:ems="50"
         android:inputType="textMultiLine"
-        android:text="/sdcard/testFFMpeg.mp4"
+        android:text="rtsp://admin:cvte123456@172.18.223.100:554/mpeg4/ch1/main/av_stream"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/playvideo"
         app:layout_constraintHorizontal_bias="0.0"

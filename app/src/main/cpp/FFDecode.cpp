@@ -26,9 +26,9 @@ bool FFDecode::Open(XParameter para, bool isHard) {
 
     //1 查找解码器
     AVCodec *cd = avcodec_find_decoder(p->codec_id);
-    if (isHard) {
-        cd = avcodec_find_decoder_by_name("h264_mediacodec");
-    }
+//    if (isHard) {
+//        cd = avcodec_find_decoder_by_name("h264_mediacodec");
+//    }
     if (!cd) {
         XLOGE("avcodec_find_decoder %d failed -- %d", p->codec_id, isHard);
         return false;
@@ -115,9 +115,11 @@ XData FFDecode::RecvFrame() {
         d.size = (frame->linesize[0] + frame->linesize[1] + frame->linesize[2]) * frame->height;
         d.width = frame->width;
         d.height = frame->height;
+        //XLOGE("视频解码数据pts:  ",frame->pts);
     } else {
         //样本字节数 * 单通道样本数 * 通道数
-        d.size = av_get_bytes_per_sample((AVSampleFormat) frame->format) * frame->nb_samples * 2;
+        d.size = av_get_bytes_per_sample((AVSampleFormat) frame->format) * frame->nb_samples * frame->channel_layout;
+        //XLOGE("音频解码数据pts:  ",frame->pts);
     }
     d.format = frame->format;
 //    if(!isAudio)

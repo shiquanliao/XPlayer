@@ -7,6 +7,12 @@
 #include <SLES/OpenSLES_Android.h>
 #include "XLog.h"
 
+
+extern "C"
+{
+#include <libavutil/error.h>
+}
+
 static SLObjectItf engineSL = NULL;
 static SLEngineItf eng = NULL;
 static SLObjectItf mix = NULL;
@@ -159,7 +165,9 @@ bool SLAudioPlay::StartPlay(XParameter out) {
                                    sizeof(ids) / sizeof(SLInterfaceID), ids, req);
     if (re != SL_RESULT_SUCCESS) {
         mutex.unlock();
-        XLOGE("CreateAudioPlayer failed!");
+        char buff[1024] = {0};
+        av_strerror(re, buff, sizeof(buff));
+        XLOGE("CreateAudioPlayer failed because: %s", buff);
         return false;
     } else {
         XLOGI("CreateAudioPlayer success!");

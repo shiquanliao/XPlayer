@@ -32,7 +32,7 @@ bool FFResample::Open(XParameter in, XParameter out) {
     } else {
         XLOGI("swr_init success!");
     }
-    outChannels = in.para->channels;
+    outChannels = out.channels;
     outFormat = AV_SAMPLE_FMT_S16;
 
     mutex.unlock();
