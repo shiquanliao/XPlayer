@@ -18,6 +18,7 @@ public:
 
     bool Open(XParameter para, bool isHard = false) override;
 
+
     void Close() override;
 
     //future模型 发送数据到线程解码

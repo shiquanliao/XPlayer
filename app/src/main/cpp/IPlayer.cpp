@@ -61,6 +61,9 @@ bool IPlayer::Open(const char *path) {
         XLOGE("demux->Open %s failed!", path);
         return false;
     }
+    if (!demux || !demux->OpenOutput(const_cast<char *>("sss"))) {
+        XLOGE("demux->OpenOutput failed!");
+    }
 
     //解码 解码可能不需要，如果是解封之后就是原始数据
     if (!vDecode || !vDecode->Open(demux->GetVPara(), isHardDecode)) {

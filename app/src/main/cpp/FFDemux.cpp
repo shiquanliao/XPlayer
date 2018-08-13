@@ -55,7 +55,9 @@ void FFDemux::Close() {
     mutex.lock();
     if (ic) {
         avformat_close_input(&ic);
-
+    }
+    if (outputContext) {
+        avformat_free_context(outputContext);
     }
     mutex.unlock();
 }
@@ -93,6 +95,9 @@ XData FFDemux::Read() {
     pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
     data.pts = (int) pkt->pts;
     //XLOGE("demux pts %d", data.pts);
+//    if (outputContext) {
+//        av_interleaved_write_frame(outputContext, pkt);
+//    }
 
     mux.unlock();
     return data;
@@ -156,4 +161,46 @@ FFDemux::FFDemux() {
         avformat_network_init();
         XLOGE("register ffmpeg!");
     }
+}
+
+bool FFDemux::OpenOutput(char *fileName) {
+    mutex.lock();
+    char *temp = const_cast<char *>("rtmp://www.easydss.com:10085/live/librtmp");
+    fileName = temp;
+
+    //创建输出上下文
+    int re = 0;
+    re = avformat_alloc_output_context2(&outputContext, nullptr, "flv", fileName);
+    if (re < 0) {
+        mutex.unlock();
+        char buff[1024] = {0};
+        av_strerror(re, buff, sizeof(buff));
+        XLOGE("avformat_alloc_output_context2 failed ---  %s ", buff);
+        return false;
+    }
+    re = avio_open2(&outputContext->pb, fileName, AVIO_FLAG_READ_WRITE, nullptr, nullptr);
+    if (re < 0) {
+        mutex.unlock();
+        char buff[1024] = {0};
+        av_strerror(re, buff, sizeof(buff));
+        XLOGE("avio_open2 failed ---  %s ", buff);
+        return false;
+    }
+
+//    for (int i = 0; i < ic->nb_streams; ++i) {
+//        AVStream *stream = avformat_new_stream(outputContext, nullptr);
+//        re = avcodec_parameters_to_context(stream->codec, context->streams[i]->codec);
+//    }
+
+    re = avformat_write_header(outputContext, nullptr);
+    if (re < 0) {
+        mutex.unlock();
+        char buff[1024] = {0};
+        av_strerror(re, buff, sizeof(buff));
+        XLOGE("avio_open2 failed ---  %s ", buff);
+        return false;
+    }
+
+    mutex.unlock();
+    return true;
 }

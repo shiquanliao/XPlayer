@@ -15,6 +15,9 @@ public:
     //打开文件，或者流媒体 rmtp http rtsp
     virtual bool Open(const char *url) = 0;
 
+    //打开输出流,可以输入到rtmp,文件等地方
+    virtual bool OpenOutput(char *fileName) = 0;
+
     virtual void Close() = 0;
 
     //获取视频参数
