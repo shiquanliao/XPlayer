@@ -95,9 +95,17 @@ XData FFDemux::Read() {
     pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
     data.pts = (int) pkt->pts;
     //XLOGE("demux pts %d", data.pts);
-//    if (outputContext) {
-//        av_interleaved_write_frame(outputContext, pkt);
-//    }
+    if (outputContext) {
+        AVPacket *outPkt = av_packet_alloc();
+        av_packet_ref(outPkt, pkt);
+        re = av_write_frame(outputContext, outPkt);
+        av_packet_unref(outPkt);
+        if (re != 0) {
+            char buff[1024] = {0};
+            av_strerror(re, buff, sizeof(buff));
+            XLOGE("av_interleaved_write_frame failed ---  %s ", buff);
+        }
+    }
 
     mux.unlock();
     return data;
@@ -187,10 +195,16 @@ bool FFDemux::OpenOutput(char *fileName) {
         return false;
     }
 
-//    for (int i = 0; i < ic->nb_streams; ++i) {
-//        AVStream *stream = avformat_new_stream(outputContext, nullptr);
-//        re = avcodec_parameters_to_context(stream->codec, context->streams[i]->codec);
-//    }
+    for (int i = 0; i < ic->nb_streams; ++i) {
+        AVStream *stream = avformat_new_stream(outputContext, nullptr);
+        re = avcodec_copy_context(stream->codec, ic->streams[i]->codec);
+        if (re < 0) {
+            char buff[1024] = {0};
+            av_strerror(re, buff, sizeof(buff));
+            XLOGE("avcodec_copy_context failed ---  %s ", buff);
+        }
+//        re = avcodec_parameters_to_context(stream->codec,ic->streams.);
+    }
 
     re = avformat_write_header(outputContext, nullptr);
     if (re < 0) {
