@@ -44,7 +44,7 @@ public:
     void Draw(unsigned char **data, int width, int height) override {
         mutex.lock();
         sh.GetTexture(0, width, height, data[0]);  // Y
-        if (type == XTEXTURE_YUV420P) {
+        if (type == XTEXTURE_YUV420P || type == XTEXTURE_YUVJ420P) {
             sh.GetTexture(1, width / 2, height / 2, data[1]);  // U
             sh.GetTexture(2, width / 2, height / 2, data[2]);  // V
         } else {

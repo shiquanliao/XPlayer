@@ -7,6 +7,7 @@
 
 enum XTextureType {
     XTEXTURE_YUV420P = 0,  // Y 4  u 1 v 1
+    XTEXTURE_YUVJ420P = 12,  // Y 4  u 1 v 1
     XTEXTURE_NV12 = 23,    // Y4   uv1
     XTEXTURE_NV21 = 24     // Y4   vu1
 };

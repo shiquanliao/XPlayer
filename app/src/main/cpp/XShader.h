@@ -10,6 +10,7 @@
 enum XShaderType
 {
     XSHADER_YUV420P = 0,    //软解码和虚拟机
+    XSHADER_YUVJ420P = 12,  // Y 4  u 1 v 1
     XSHADER_NV12 = 23,      //手机
     XSHADER_NV21 = 24
 };

@@ -165,6 +165,7 @@ bool XShader::Init(XShaderType type) {
     //片元yuv420 shader初始化
     switch (type) {
         case XSHADER_YUV420P:
+        case XSHADER_YUVJ420P:
             fsh = InitShader(fragYUV420P, GL_FRAGMENT_SHADER);
             break;
         case XSHADER_NV12:
@@ -172,7 +173,6 @@ bool XShader::Init(XShaderType type) {
             break;
         case XSHADER_NV21:
             fsh = InitShader(fragNV21, GL_FRAGMENT_SHADER);
-
             break;
         default:
             mutex.unlock();
@@ -242,6 +242,7 @@ bool XShader::Init(XShaderType type) {
     glUniform1i(glGetUniformLocation(program, "yTexture"), 0); //对于纹理第1层
     switch (type) {
         case XSHADER_YUV420P:
+        case XSHADER_YUVJ420P:
             glUniform1i(glGetUniformLocation(program, "uTexture"), 1); //对于纹理第2层
             glUniform1i(glGetUniformLocation(program, "vTexture"), 2); //对于纹理第3层
             break;
