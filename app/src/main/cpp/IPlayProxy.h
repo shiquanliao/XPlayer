@@ -25,6 +25,10 @@ public:
 
     bool Start() override;
 
+    void StartPushStream(const char *path, unsigned char i) override;
+
+    void StopPushStream() override;
+
 protected:
     IPlayProxy() {};
     IPlayer *player = 0;

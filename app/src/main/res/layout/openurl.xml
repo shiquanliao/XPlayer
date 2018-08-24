@@ -43,7 +43,7 @@
         android:layout_marginTop="24dp"
         android:ems="50"
         android:inputType="textMultiLine"
-        android:text="rtsp://admin:cvte123456@172.18.223.100:554/mpeg4/ch1/main/av_stream"
+        android:text="rtmp://demo.easydss.com:10085/hls/ryyv6UT8X?sign=rygJPpUaUX"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/playvideo"
         app:layout_constraintHorizontal_bias="0.0"

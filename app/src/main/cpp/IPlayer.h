@@ -32,6 +32,10 @@ public:
 
     bool Start() override;
 
+    virtual void StartPushStream(const char *path, unsigned char i);
+
+    virtual void StopPushStream();
+
 
     //是否视频硬解码
     bool isHardDecode = true;

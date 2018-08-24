@@ -61,9 +61,9 @@ bool IPlayer::Open(const char *path) {
         XLOGE("demux->Open %s failed!", path);
         return false;
     }
-    if (!demux || !demux->OpenOutput(const_cast<char *>("sss"))) {
-        XLOGE("demux->OpenOutput failed!");
-    }
+//    if (!demux || !demux->OpenOutput(const_cast<char *>("sss"))) {
+//        XLOGE("demux->OpenOutput failed!");
+//    }
 
     //解码 解码可能不需要，如果是解封之后就是原始数据
     if (!vDecode || !vDecode->Open(demux->GetVPara(), isHardDecode)) {
@@ -133,7 +133,7 @@ void IPlayer::Main() {
         //同步
         //获取音频的pts 告诉视频
         int apts = audioPlay->pts;
-        XLOGE("apts = %d", apts);
+//        XLOGE("apts = %d", apts);
         vDecode->synPts = apts;
 
         mutex.unlock();
@@ -143,4 +143,16 @@ void IPlayer::Main() {
 
 IPlayer::IPlayer() {
 
+}
+
+void IPlayer::StartPushStream(const char *path, unsigned char i) {
+    mutex.lock();
+    demux->StartPushStream(path, i);
+    mutex.unlock();
+}
+
+void IPlayer::StopPushStream() {
+    mutex.lock();
+    demux->StopPushStream();
+    mutex.unlock();
 }

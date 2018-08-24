@@ -51,3 +51,17 @@ void IPlayProxy::Close() {
         player->Close();
     mutex.unlock();
 }
+
+void IPlayProxy::StartPushStream(const char *path, unsigned char i) {
+    mutex.lock();
+    if (player)
+        player->StartPushStream(path, i);
+    mutex.unlock();
+}
+
+void IPlayProxy::StopPushStream() {
+    mutex.lock();
+    if (player)
+        player->StopPushStream();
+    mutex.unlock();
+}

@@ -8,6 +8,9 @@
 extern "C"
 {
 #include <libavformat/avformat.h>
+//#include<libavutil/mathematics.h>
+//#include<libavutil/time.h>
+
 }
 
 //分数转为浮点数
@@ -21,7 +24,17 @@ bool FFDemux::Open(const char *url) {
     XLOGI("Open file %s begin", url);
     Close();
     mutex.lock();
-    int re = avformat_open_input(&ic, url, 0, 0);
+
+    //使用TCP连接打开RTSP，设置最大延迟时间
+    AVDictionary *avdic = NULL;
+    char option_key[] = "rtsp_transport";
+    char option_value[] = "tcp";
+    av_dict_set(&avdic, option_key, option_value, 0);
+    char option_key2[] = "max_delay";
+    char option_value2[] = "5000000";
+    av_dict_set(&avdic, option_key2, option_value2, 0);
+
+    int re = avformat_open_input(&ic, url, 0, &avdic);
     if (re != 0) {
         mutex.unlock();
         char buff[1024] = {0};
@@ -59,6 +72,9 @@ void FFDemux::Close() {
     if (outputContext) {
         avformat_free_context(outputContext);
     }
+    if (ofmt) {
+        ofmt = nullptr;
+    }
     mutex.unlock();
 }
 
@@ -95,7 +111,9 @@ XData FFDemux::Read() {
     pkt->dts = pkt->dts * (1000 * r2d(ic->streams[pkt->stream_index]->time_base));
     data.pts = (int) pkt->pts;
     //XLOGE("demux pts %d", data.pts);
-    if (outputContext) {
+
+    // 推流
+    if (outputContext && !isStopPush) {
         AVPacket *outPkt = av_packet_alloc();
         av_packet_ref(outPkt, pkt);
         re = av_write_frame(outputContext, outPkt);
@@ -106,6 +124,7 @@ XData FFDemux::Read() {
             XLOGE("av_interleaved_write_frame failed ---  %s ", buff);
         }
     }
+
 
     mux.unlock();
     return data;
@@ -171,13 +190,16 @@ FFDemux::FFDemux() {
     }
 }
 
-bool FFDemux::OpenOutput(char *fileName) {
+bool FFDemux::OpenOutput(const char *fileName, unsigned char i) {
     mutex.lock();
-//    char *temp = const_cast<char *>("rtmp://demo.easydss.com:10085/hls/HyviKYhsI7?sign=HJdsKKhsLX");
+    isStopPush = false;
+    char *temp = const_cast<char *>("rtmp://demo.easydss.com:10085/hls/ryyv6UT8X?sign=rygJPpUaUX");
 //    char *temp = const_cast<char *>("rtmp://://live-api-s.facebook.com:80/rtmp/147055689548657?ds=1&s_sw=0&s_vt=api-s&a=ATj7H3akQzXhPI3y");
-    char *temp = const_cast<char *>("rtmp://live-api-s.facebook.com:80/rtmp/146986029555623?ds=1&s_sw=0&s_vt=api-s&a=AThsGrqOMkSXn8FQ");
+//    char *temp = const_cast<char *>("rtmp://live-api-s.facebook.com:80/rtmp/146986029555623?ds=1&s_sw=0&s_vt=api-s&a=AThsGrqOMkSXn8FQ");
 //    char *temp = const_cast<char *>("rtmp://://a.rtmp.youtube.com/live2/j8k7-ak0b-3sg1-4cec");
-    fileName = temp;
+    if (i) {
+        fileName = temp;
+    }
 
     //创建输出上下文
     int re = 0;
@@ -198,15 +220,24 @@ bool FFDemux::OpenOutput(char *fileName) {
         return false;
     }
 
+    if (i) {
+        ofmt = outputContext->oformat;
+    }
+
     for (int i = 0; i < ic->nb_streams; ++i) {
-        AVStream *stream = avformat_new_stream(outputContext, nullptr);
+        //根据输入流创建输出流
+        AVStream *in_stream = ic->streams[i];
+        AVStream *stream = avformat_new_stream(outputContext, in_stream->codec->codec);
+        //将输出流的编码信息复制到输入流
         re = avcodec_copy_context(stream->codec, ic->streams[i]->codec);
         if (re < 0) {
             char buff[1024] = {0};
             av_strerror(re, buff, sizeof(buff));
             XLOGE("avcodec_copy_context failed ---  %s ", buff);
         }
-//        re = avcodec_parameters_to_context(stream->codec,ic->streams.);
+        stream->codec->codec_tag = 0;
+//        if (outputContext->oformat->flags & AVFMT_GLOBALHEADER)
+//            stream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
     }
 
     re = avformat_write_header(outputContext, nullptr);
@@ -217,8 +248,24 @@ bool FFDemux::OpenOutput(char *fileName) {
         XLOGE("avio_open2 failed ---  %s ", buff);
         return false;
     }
-    XLOGE("----------------- success   output: %s-------------------------- ",temp);
+    XLOGE("-------------path:   %s",fileName);
+    XLOGE("----------------- success   output: %s-------------------------- ", fileName);
 
     mutex.unlock();
     return true;
+}
+
+// 开始推流
+void FFDemux::StartPushStream(const char *path, unsigned char i) {
+    OpenOutput(path, i);
+}
+
+// 停止推流
+void FFDemux::StopPushStream() {
+    mutex.lock();
+    isStopPush = true;
+    //写文件尾
+    av_write_trailer(outputContext);
+    mutex.unlock();
+
 }

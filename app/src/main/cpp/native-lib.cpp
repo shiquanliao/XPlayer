@@ -49,3 +49,24 @@ Java_com_tutk_xplayer_xplayer_OpenUrlActivity_Open(JNIEnv *env, jobject instance
 
     env->ReleaseStringUTFChars(url_, url);
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tutk_xplayer_xplayer_MainActivity_stopPushStream(JNIEnv *env, jobject instance) {
+
+    // TODO
+    IPlayProxy::Get()->StopPushStream();
+
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_tutk_xplayer_xplayer_MainActivity_startPushStream(JNIEnv *env, jobject instance,
+                                                           jstring url_, jboolean isPushToRTMP) {
+    const char *url = env->GetStringUTFChars(url_, 0);
+
+    // TODO
+    IPlayProxy::Get()->StartPushStream(url, isPushToRTMP);
+
+    env->ReleaseStringUTFChars(url_, url);
+}
