@@ -28,7 +28,7 @@ public:
     //由主体notify的数据 阻塞
     virtual void Update(XData data);
 
-    bool isAudio = false;
+    bool isAudio = true; // 默认必须是true
 
     //最大的队列缓冲
     int maxList = 100;
@@ -37,6 +37,9 @@ public:
     int synPts = 0;
     //当前视频播放的pts
     int pts = 0;
+
+    // 判断当前是否有音频
+    int isHaveAudio = true;
 
 
 protected:

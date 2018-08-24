@@ -34,6 +34,8 @@
 
 
     <!--android:text="/sdcard/testFFMpeg.mp4"-->
+    <!--android:text="rtsp://admin:cvte123456@172.18.223.100:554/mpeg4/ch1/main/av_stream"-->
+    <!--android:text="rtsp://admin:cvte123456@172.18.220.122:554/main"-->
     <EditText
         android:id="@+id/fileurl"
         android:layout_width="wrap_content"

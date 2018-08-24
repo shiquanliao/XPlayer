@@ -32,7 +32,7 @@ void IDecode::Main() {
         packsMutex.lock();
 
         // 判断音视频同步
-        if (!isAudio && synPts > 0) {
+        if (!isAudio && synPts > 0 && isHaveAudio) {
             if (synPts < pts) {
                 packsMutex.unlock();
                 XSleep(1);

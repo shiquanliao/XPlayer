@@ -173,7 +173,10 @@ FFDemux::FFDemux() {
 
 bool FFDemux::OpenOutput(char *fileName) {
     mutex.lock();
-    char *temp = const_cast<char *>("rtmp://www.easydss.com:10085/live/librtmp");
+//    char *temp = const_cast<char *>("rtmp://demo.easydss.com:10085/hls/HyviKYhsI7?sign=HJdsKKhsLX");
+//    char *temp = const_cast<char *>("rtmp://://live-api-s.facebook.com:80/rtmp/147055689548657?ds=1&s_sw=0&s_vt=api-s&a=ATj7H3akQzXhPI3y");
+    char *temp = const_cast<char *>("rtmp://live-api-s.facebook.com:80/rtmp/146986029555623?ds=1&s_sw=0&s_vt=api-s&a=AThsGrqOMkSXn8FQ");
+//    char *temp = const_cast<char *>("rtmp://://a.rtmp.youtube.com/live2/j8k7-ak0b-3sg1-4cec");
     fileName = temp;
 
     //创建输出上下文
@@ -214,6 +217,7 @@ bool FFDemux::OpenOutput(char *fileName) {
         XLOGE("avio_open2 failed ---  %s ", buff);
         return false;
     }
+    XLOGE("----------------- success   output: %s-------------------------- ",temp);
 
     mutex.unlock();
     return true;
